@@ -27,7 +27,7 @@ def is_blocked_or_banned(ip_address):
 @app.before_request
 def check_block_ban_status():
     ip_address = request.remote_addr
-    if is_blocked_or_ban(ip_address):
+    if is_blocked_or_banned(ip_address):
         abort(403, description="Blocked or Banned")
 
 @app.route('/create_moderator', methods=['POST'])
@@ -35,6 +35,7 @@ def create_moderator():
     if request.headers.get('Admin-Key') != admin_key:
         abort(403, description="Unauthorized")
 
+"""
 @app.route('/protected_endpoint', methods=['POST'])
 def key_protected_endpoint():
     ip_address = request.remote_addr
@@ -47,6 +48,7 @@ def key_protected_endpoint():
                 'expiry': datetime.utcnow() + timedelta(minutes=BAN_DURATION_MINUTES)
             }
         abort(403, description="Invalid Key")
+"""
 
 @app.route('/user', methods=['POST'])
 def create_user():
