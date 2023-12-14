@@ -5,7 +5,6 @@ import threading
 
 app = Flask(__name__)
 
-
 @app.get("/random/<int:sides>")
 def roll(sides):
     if sides <= 0:
