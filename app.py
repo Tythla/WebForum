@@ -79,6 +79,13 @@ def get_posts_by_date():
 
     return jsonify(filtered_posts)
 
+@app.route('/posts/user/<int:user_id>', methods=['GET'])
+def get_posts_by_user(user_id):
+    with lock:
+        user_posts = [post for post in posts.values() if post.get('user_id') == user_id]
+    
+    return jsonify(user_posts)
+
 @app.route('/post', methods=['POST'])
 def create_post():
     global post_id
