@@ -11,6 +11,12 @@ posts = {}
 post_id = 0
 user_manager = UserManager()
 lock = threading.Lock()
+admin_key = "admin_key"
+
+@app.route('/create_moderator', methods=['POST'])
+def create_moderator():
+    if request.headers.get('Admin-Key') != admin_key:
+        abort(403, description="Unauthorized")
 
 @app.route('/user', methods=['POST'])
 def create_user():
@@ -126,7 +132,9 @@ def delete_post(post_id, key):
             abort(404, description="Post not found")
 
         post = posts[post_id]
-        # Check if the key is either the post's key or the user's key
+        if any(user.mod_key == key and user.is_moderator for user in user_manager.users.values()):
+            del posts[post_id]
+            return jsonify(status="Post deleted by moderator")
         if post['key'] == key or (post.get('user_id') and user_manager.validate_user(post['user_id'], key)):
             del posts[post_id]
             return jsonify(id=post_id, key=key, timestamp=post['timestamp'])
