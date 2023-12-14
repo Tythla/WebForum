@@ -3,6 +3,7 @@ import datetime
 import os
 import threading
 from users import UserManager
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -49,6 +50,28 @@ def edit_user_metadata(user_id):
         user.avatar_icon = new_avatar_icon
 
     return jsonify(user_id=user.user_id, username=user.username, real_name=user.real_name, avatar_icon=user.avatar_icon)
+
+@app.route('/posts', methods=['GET'])
+def get_posts_by_date():
+    start = request.args.get('start')
+    end = request.args.get('end')
+
+    try:
+        if start:
+            start = datetime.fromisoformat(start)
+        if end:
+            end = datetime.fromisoformat(end)
+    except ValueError:
+        abort(400, description="Invalid date format. Use ISO 8601 format.")
+
+    filtered_posts = []
+    with lock:
+        for post in posts.values():
+            post_time = datetime.fromisoformat(post['timestamp'])
+            if (not start or post_time >= start) and (not end or post_time <= end):
+                filtered_posts.append(post)
+
+    return jsonify(filtered_posts)
 
 @app.route('/post', methods=['POST'])
 def create_post():
