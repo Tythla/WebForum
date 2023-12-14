@@ -3,20 +3,50 @@ import datetime
 import os
 import threading
 from users import UserManager
-from datetime import datetime
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
 posts = {}
+failed_attempts = {}
+block_ban_list = {}
 post_id = 0
 user_manager = UserManager()
 lock = threading.Lock()
 admin_key = "admin_key"
 
+def is_blocked_or_banned(ip_address):
+    if ip_address in block_ban_list:
+        expiry_time = block_ban_list[ip_address]['expiry']
+        if datetime.utcnow() <= expiry_time:
+            return True
+        else:
+            del block_ban_list[ip_address]
+    return False
+
+@app.before_request
+def check_block_ban_status():
+    ip_address = request.remote_addr
+    if is_blocked_or_ban(ip_address):
+        abort(403, description="Blocked or Banned")
+
 @app.route('/create_moderator', methods=['POST'])
 def create_moderator():
     if request.headers.get('Admin-Key') != admin_key:
         abort(403, description="Unauthorized")
+
+@app.route('/protected_endpoint', methods=['POST'])
+def key_protected_endpoint():
+    ip_address = request.remote_addr
+    user_key = request.json.get('key')
+    
+    if not validate_key(user_key):
+        failed_attempts[ip_address] = failed_attempts.get(ip_address, 0) + 1
+        if failed_attempts[ip_address] >= MAX_FAILED_ATTEMPTS:
+            block_ban_list[ip_address] = {
+                'expiry': datetime.utcnow() + timedelta(minutes=BAN_DURATION_MINUTES)
+            }
+        abort(403, description="Invalid Key")
 
 @app.route('/user', methods=['POST'])
 def create_user():
