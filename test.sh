@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Activate virtual environment and run Python tests
-source venv/bin/activate
 python3 test.py
 
 # Run Postman collections with Newman
