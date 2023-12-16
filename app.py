@@ -130,7 +130,7 @@ def create_post():
             if user_manager.validate_user(user_id, user_key):
                 post_id += 1
                 key = os.urandom(24).hex()
-                timestamp = datetime.datetime.utcnow().isoformat()
+                timestamp = datetime.utcnow().isoformat()
                 post = {'id': post_id, 'key': key, 'timestamp': timestamp, 'msg': content['msg'], 'user_id': user_id}
                 posts[post_id] = post
                 return jsonify(post)
@@ -140,7 +140,7 @@ def create_post():
     with lock:
         post_id += 1
         key = os.urandom(24).hex()
-        timestamp = datetime.datetime.utcnow().isoformat()
+        timestamp = datetime.utcnow().isoformat()
         posts[post_id] = {'id': post_id, 'key': key, 'timestamp': timestamp, 'msg': content['msg']}
 
     return jsonify(id=post_id, key=key, timestamp=timestamp)
