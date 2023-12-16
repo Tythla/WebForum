@@ -54,36 +54,34 @@ class TestFlaskApi(unittest.TestCase):
         data = json.loads(response.data)
         self.assertEqual(data['username'], 'testuser')
 
-    def test_create_moderator_endpoint(self):
-        # Test the create moderator endpoint
-        response = self.app.post(
-            '/create_moderator', headers={'Admin-Key': 'admin_key'}, json={'username': 'moduser'})
-        self.assertEqual(response.status_code, 200)
-        # Additional assertions based on the response structure
+def test_create_moderator_endpoint(self):
+    response = self.app.post('/create_moderator',
+                             headers={'Admin-Key': 'admin_key'},
+                             json={'username': 'newmod', 'real_name': 'New Mod'})
+    self.assertEqual(response.status_code, 201)
 
     def test_post_creation_endpoint(self):
         # Test post creation
-        # Assuming there's an endpoint for creating posts
         post_data = {'msg': 'This is a test post'}
         response = self.app.post('/post', json=post_data)
         self.assertEqual(response.status_code, 200)
-        # Additional assertions based on the response structure
 
     def test_post_read_endpoint(self):
         # Test reading a post
-        # Create a post first (or use a mock post)
-        # Then test reading that post
+        # Create a post then test reading that post
         response = self.app.get('/post/1')  # Assuming a post with ID 1
         self.assertEqual(response.status_code, 200)
-        # Additional assertions
 
     def test_post_delete_endpoint(self):
-        # Test deleting a post
-        # Create a post first (or use a mock post)
-        # Then test deleting that post
-        # Assuming a post with ID 1 and a valid user key
-        response = self.app.delete(
-            '/post/1', headers={'User-Key': 'valid_user_key'})
+        # Create a post and get its ID and key
+        post_data = {'msg': 'Test Post for Deletion'}
+        create_response = self.app.post('/post', json=post_data)
+        post_id = create_response.json['id']
+        key = create_response.json['key']
+
+        # Delete the post
+        delete_url = f'/post/{post_id}/delete/{key}'
+        response = self.app.delete(delete_url)
         self.assertEqual(response.status_code, 200)
 
 

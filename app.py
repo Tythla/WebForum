@@ -34,6 +34,7 @@ def check_block_ban_status():
 def create_moderator():
     if request.headers.get('Admin-Key') != admin_key:
         abort(403, description="Unauthorized")
+    return jsonify({'message': 'Moderator created successfully'}), 201
 
 """
 @app.route('/protected_endpoint', methods=['POST'])
