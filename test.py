@@ -54,11 +54,11 @@ class TestFlaskApi(unittest.TestCase):
         data = json.loads(response.data)
         self.assertEqual(data['username'], 'testuser')
 
-def test_create_moderator_endpoint(self):
-    response = self.app.post('/create_moderator',
-                             headers={'Admin-Key': 'admin_key'},
-                             json={'username': 'newmod', 'real_name': 'New Mod'})
-    self.assertEqual(response.status_code, 201)
+    def test_create_moderator_endpoint(self):
+        response = self.app.post('/create_moderator',
+                                headers={'Admin-Key': 'admin_key'},
+                                json={'username': 'newmod', 'real_name': 'New Mod'})
+        self.assertEqual(response.status_code, 201)
 
     def test_post_creation_endpoint(self):
         # Test post creation
